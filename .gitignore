@@ -1,0 +1,15 @@
+.*
+!/.bowerrc
+!/.gitignore
+/dist/
+/html/
+/node_modules/
+/bower_components/
+/tmp/
+/output/
+
+# nix
+nixpkgs
+
+# emacs
+\#*
