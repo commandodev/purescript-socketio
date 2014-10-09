@@ -8,7 +8,7 @@ import Control.SocketIO
 
 printOn s c = onMsg s c print
 
-connectAndOn :: forall eff. Eff (socket :: SocketIO, trace :: Trace | eff) Unit
+-- connectAndOn :: forall eff. Eff (socket :: SocketIO, trace :: Trace | eff) Unit
 connectAndOn = do
   s <- connect "http://localhost/test"
   onMsg s "error" print
