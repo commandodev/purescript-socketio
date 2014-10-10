@@ -30,7 +30,7 @@ foreign import connect
 foreign import onImpl
   "function onImpl(sock, channel, onMessage) {\
   \  return function() {\
-  \    sock.on(channel, onMessage)\
+  \    sock.on(channel, function(m){ onMessage(m)();});\
   \  };\
   \}" :: forall eff. Fn3 Socket
                        Channel   
@@ -40,7 +40,7 @@ foreign import onImpl
 foreign import emitImpl
   "function emitImpl(sock, channel) {\
   \  return function() {\
-  \    sock.emit(channel)\
+  \    sock.emit(channel);\
   \  };\
   \}" :: forall eff. Fn2 Socket
                          Channel
@@ -49,18 +49,19 @@ foreign import emitImpl
 foreign import emitMsgImpl
   "function emitMsgImpl(sock, channel, emitMessage) {\
   \  return function() {\
-  \    sock.emit(channel, emitMessage)\
+  \    sock.emit(channel, emitMessage);\
   \  };\
   \}" :: forall eff. Fn3 Socket
                          Channel
                          String
                          (Eff (socket :: SocketIO | eff) Unit)
 
-onMsg :: forall eff. Socket 
+onMsg :: forall eff a. (IsForeign a)
+      => Socket 
       -> Channel 
-      -> MsgCallback String eff
+      -> MsgCallback (F a) eff
       -> Eff (socket :: SocketIO | eff) Unit
-onMsg = runFn3 onImpl
+onMsg s c k = runFn3 onImpl s c (k <<< readJSON)
 
 emit:: forall eff. Socket -> Channel -> Eff (socket :: SocketIO | eff) Unit
 emit = runFn2 emitImpl
@@ -69,6 +70,6 @@ emitMsg:: forall eff a. Socket
        -> Channel
        -> a
        -> Eff (socket :: SocketIO | eff) Unit
-emitMsg s c d = let data' = stringify $ toForeign $ d
+emitMsg s c d = let data' = stringify $ toForeign d
                     emitMsg  = runFn3 emitMsgImpl
                 in  emitMsg s c data' 
