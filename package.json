@@ -1,6 +1,6 @@
 {
   "name": "purescript-socketio",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Purescript bindings to socket.io",
   "main": "index.js",
   "scripts": {
